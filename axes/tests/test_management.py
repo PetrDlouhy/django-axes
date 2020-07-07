@@ -1,9 +1,11 @@
 from io import StringIO
 from unittest.mock import patch, Mock
 
+from django.test import override_settings
 from django.core.management import call_command
 from django.utils import timezone
 
+from axes.helpers import get_cache, make_cache_key
 from axes.models import AccessAttempt, AccessLog
 from axes.tests.base import AxesTestCase
 
@@ -107,3 +109,10 @@ class ManagementCommandTestCase(AxesTestCase):
 
         expected = "No attempts found.\n"
         self.assertEqual(expected, out.getvalue())
+
+
+@override_settings(AXES_HANDLER='axes.handlers.cache.AxesCacheHandler')
+class CacheManagementCommandTestCase(ManagementCommandTestCase):
+    def setUp(self):
+        get_cache().set(make_cache_key({'username': "jane.doe", 'ip_address': "10.0.0.1"}), "4")
+        get_cache().set(make_cache_key({'username': "jane.doe", 'ip_address': "10.0.0.2"}), "15")

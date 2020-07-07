@@ -30,6 +30,21 @@ class AxesCacheHandler(AxesHandler):  # pylint: disable=too-many-locals
         cache_key = get_client_cache_key(request, credentials)
         return self.cache.get(cache_key, default=0)
 
+    def reset_attempts(self, *, ip_address: str = None, username: str = None) -> int:
+        count = 0
+        if ip_address:
+            cache_key = make_cache_key({'ip_address': ip_address})
+            count = len(self.cache.get_many(cache_key))
+            self.cache.delete(cache_key)
+        if username:
+            cache_key = make_cache_key({'username': username})
+            count = len(self.cache.get_many(cache_key))
+            self.cache.delete(cache_key)
+
+        log.info("AXES: Reset %d access attempts from database.", count)
+
+        return count
+
     def user_login_failed(
         self, sender, credentials: dict, request=None, **kwargs
     ):  # pylint: disable=too-many-locals

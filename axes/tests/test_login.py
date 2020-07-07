@@ -13,7 +13,7 @@ from django.contrib.auth import get_user_model, login, logout
 
 from axes.conf import settings
 from axes.models import AccessAttempt
-from axes.helpers import get_cache, make_cache_key
+from axes.helpers import get_cache
 from axes.tests.base import AxesTestCase
 
 
@@ -537,6 +537,3 @@ class CacheLoginTestCase(DatabaseLoginTestCase):
         cache = get_cache()
         keys = cache._cache
         return len(keys)
-
-    def reset(self, **kwargs):
-        get_cache().delete(make_cache_key(kwargs))

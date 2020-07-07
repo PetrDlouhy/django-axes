@@ -4,6 +4,7 @@ from django.test import override_settings
 from django.utils.timezone import now
 
 from axes.attempts import get_cool_off_threshold
+from axes.helpers import get_cache
 from axes.models import AccessAttempt
 from axes.tests.base import AxesTestCase
 from axes.utils import reset
@@ -29,18 +30,21 @@ class GetCoolOffThresholdTestCase(AxesTestCase):
             get_cool_off_threshold()
 
 
-class ResetTestCase(AxesTestCase):
+class DatabaseResetTestCase(AxesTestCase):
+    def attempt_count(self):
+        return AccessAttempt.objects.count()
+
     def test_reset(self):
         self.create_attempt()
         reset()
-        self.assertFalse(AccessAttempt.objects.count())
+        self.assertFalse(self.attempt_count())
 
     def test_reset_ip(self):
         self.create_attempt(ip_address=self.ip_address)
         reset(ip=self.ip_address)
-        self.assertFalse(AccessAttempt.objects.count())
+        self.assertFalse(self.attempt_count())
 
     def test_reset_username(self):
         self.create_attempt(username=self.username)
         reset(username=self.username)
-        self.assertFalse(AccessAttempt.objects.count())
+        self.assertFalse(self.attempt_count())
