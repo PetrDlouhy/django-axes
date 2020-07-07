@@ -11,6 +11,7 @@ from axes.helpers import (
     get_client_username,
     get_credentials,
     get_failure_limit,
+    make_cache_key
 )
 
 log = getLogger(settings.AXES_LOGGER)
